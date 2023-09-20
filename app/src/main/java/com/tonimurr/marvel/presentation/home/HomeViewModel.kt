@@ -1,4 +1,4 @@
-package com.tonimurr.marvel.presentation
+package com.tonimurr.marvel.presentation.home
 
 import android.util.Log
 import androidx.lifecycle.ViewModel
@@ -11,7 +11,7 @@ import kotlinx.coroutines.flow.onEach
 import javax.inject.Inject
 
 @HiltViewModel
-class MainViewModel @Inject constructor(
+class HomeViewModel @Inject constructor(
     private val _getMarvelCharactersUseCase: GetMarvelCharactersUseCase
 ) : ViewModel() {
 
