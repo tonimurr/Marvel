@@ -1,20 +1,18 @@
 package com.tonimurr.marvel.presentation
 
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.util.Log
-import androidx.activity.viewModels
-import com.tonimurr.marvel.R
+import com.tonimurr.marvel.databinding.ActivityMainBinding
+import com.tonimurr.marvel.presentation.base.MarvelActivity
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
-class MainActivity : AppCompatActivity() {
+class MainActivity : MarvelActivity() {
 
-    private val _viewModel: MainViewModel by viewModels()
+    private lateinit var _binding: ActivityMainBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
-        _viewModel.fetchCharacters()
+        _binding = ActivityMainBinding.inflate(layoutInflater)
+        setContentView(_binding.root)
     }
 }
