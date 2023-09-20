@@ -1,12 +1,14 @@
 package com.tonimurr.marvel.di
 
-import android.content.Context
 import com.tonimurr.marvel.BuildConfig
+import com.tonimurr.marvel.common.toMd5
 import com.tonimurr.marvel.data.remote.AppApi
+import com.tonimurr.marvel.data.repositories.MarvelRepositoryImplementation
+import com.tonimurr.marvel.domain.repositories.MarvelRepository
+import com.tonimurr.marvel.domain.usecases.GetMarvelCharactersUseCase
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
-import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import okhttp3.Interceptor
 import okhttp3.OkHttpClient
@@ -22,11 +24,20 @@ class AppModule {
 
     @Singleton
     @Provides
-    fun providesRetrofit(@ApplicationContext context: Context): AppApi {
+    fun providesRetrofit(): AppApi {
 
-        val headerInterceptor = Interceptor {
+        //Add default query parameters, headers, etc...
+        val genericInterceptor = Interceptor {
             val requestBuilder = it.request().newBuilder()
-            //Add custom headers
+            val originalUrl = it.request().url
+            val ts = System.currentTimeMillis()
+            val strToHash = "$ts${BuildConfig.PRIVATE_KEY}${BuildConfig.API_KEY}"
+            val newUrl = originalUrl.newBuilder()
+                .addQueryParameter("apikey", BuildConfig.API_KEY)
+                .addQueryParameter("hash", strToHash.toMd5())
+                .addQueryParameter("ts", ts.toString())
+                .build()
+            requestBuilder.url(newUrl)
             it.proceed(requestBuilder.build())
         }
 
@@ -37,7 +48,7 @@ class AppModule {
             .connectTimeout(BuildConfig.CONNECTION_TIMEOUT.toLong(), TimeUnit.SECONDS)
             .readTimeout(BuildConfig.READ_TIMEOUT.toLong(), TimeUnit.SECONDS)
             .writeTimeout(BuildConfig.WRITE_TIMEOUT.toLong(), TimeUnit.SECONDS)
-            .addInterceptor(headerInterceptor)
+            .addInterceptor(genericInterceptor)
             .addInterceptor(loggingInterceptor)
             .build()
 
@@ -48,7 +59,18 @@ class AppModule {
             .build()
             .create(AppApi::class.java)
 
+    }
 
+    @Singleton
+    @Provides
+    fun providesMarvelRepository(api: AppApi): MarvelRepository {
+        return MarvelRepositoryImplementation(api)
+    }
+
+
+    @Provides
+    fun providesGetMarvelCharactersUseCase(marvelRepository: MarvelRepository): GetMarvelCharactersUseCase {
+        return GetMarvelCharactersUseCase(marvelRepository)
     }
 
 }
