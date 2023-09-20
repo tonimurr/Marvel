@@ -1,12 +1,15 @@
-package com.tonimurr.marvel.presentation.home
+package com.tonimurr.marvel.presentation.screen_home
 
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.viewModels
+import androidx.navigation.Navigation
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.tonimurr.marvel.R
 import com.tonimurr.marvel.databinding.FragmentHomeBinding
+import com.tonimurr.marvel.domain.model.MarvelCharacter
 import com.tonimurr.marvel.presentation.base.MarvelFragment
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -22,7 +25,6 @@ class HomeFragment : MarvelFragment() {
         savedInstanceState: Bundle?
     ): View {
         _binding = FragmentHomeBinding.inflate(layoutInflater)
-        _viewModel.fetchCharacters()
         return _binding.root
     }
 
@@ -37,11 +39,15 @@ class HomeFragment : MarvelFragment() {
             override fun triggerLoadMore() {
                 _viewModel.fetchCharacters()
             }
+
+            override fun didClickOnCharacter(view: View, character: MarvelCharacter) {
+                Navigation.findNavController(view).navigate(R.id.action_homeFragment_to_characterDetailsFragment)
+            }
         })
 
         _viewModel.liveMarvelCharacters().observe(viewLifecycleOwner) { marvelCharacters ->
             marvelCharacters?.let {
-                adapter.addMarvelCharacters(it)
+                adapter.setMarvelCharacters(it)
             }
         }
 

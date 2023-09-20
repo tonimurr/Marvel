@@ -1,6 +1,5 @@
-package com.tonimurr.marvel.presentation.home
+package com.tonimurr.marvel.presentation.screen_home
 
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -25,6 +24,10 @@ class HomeViewModel @Inject constructor(
     private var _offset = 0
     private val _limit = 20
 
+    init {
+        fetchCharacters()
+    }
+
     fun fetchCharacters() {
         _getMarvelCharactersUseCase(_offset, _limit).onEach { resource ->
             when(resource) {
@@ -35,12 +38,18 @@ class HomeViewModel @Inject constructor(
                     showHideInitialLoader(false)
                     resource.data?.let {
                         _offset += _limit
-                        val listToPost = mutableListOf<Any>()
-                        listToPost.addAll(it.data)
-                        if(it.hasMore) {
-                            listToPost.add(LoadingUIModel())
+                        val existingMarvelCharacters = mutableListOf<Any>()
+                        _liveMarvelCharacters.value?.let { oldList ->
+                            existingMarvelCharacters.addAll(oldList)
                         }
-                        _liveMarvelCharacters.postValue(listToPost)
+                        if(existingMarvelCharacters.isNotEmpty() && existingMarvelCharacters.last() is LoadingUIModel) {
+                            existingMarvelCharacters.removeLast()
+                        }
+                        existingMarvelCharacters.addAll(it.data) //new data
+                        if(it.hasMore){
+                            existingMarvelCharacters.add(LoadingUIModel())
+                        }
+                        _liveMarvelCharacters.postValue(existingMarvelCharacters)
                     }
                 }
                 is Resource.Error -> {

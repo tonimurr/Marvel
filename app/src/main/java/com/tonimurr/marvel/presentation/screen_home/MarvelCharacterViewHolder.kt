@@ -1,4 +1,4 @@
-package com.tonimurr.marvel.presentation.home
+package com.tonimurr.marvel.presentation.screen_home
 
 import com.bumptech.glide.Glide
 import com.tonimurr.marvel.databinding.ViewHolderMarvelCharacterBinding
