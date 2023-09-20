@@ -1,11 +1,8 @@
 package com.tonimurr.marvel.presentation
 
 import android.os.Bundle
-import androidx.activity.viewModels
-import com.tonimurr.marvel.R
 import com.tonimurr.marvel.databinding.ActivityMainBinding
 import com.tonimurr.marvel.presentation.base.MarvelActivity
-import com.tonimurr.marvel.presentation.home.HomeViewModel
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint

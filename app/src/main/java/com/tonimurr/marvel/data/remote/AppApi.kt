@@ -9,6 +9,6 @@ import retrofit2.http.Query
 interface AppApi {
 
     @GET("v1/public/characters")
-    suspend fun getMarvelCharacters(): BaseResponse<MarvelCharacterDTO>
+    suspend fun getMarvelCharacters(@Query("offset") offset: Int? = null, @Query("limit") limit: Int? = null): BaseResponse<MarvelCharacterDTO>
 
 }
