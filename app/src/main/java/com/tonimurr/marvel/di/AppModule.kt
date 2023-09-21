@@ -1,7 +1,10 @@
 package com.tonimurr.marvel.di
 
+import android.content.Context
+import androidx.room.Room
 import com.tonimurr.marvel.BuildConfig
 import com.tonimurr.marvel.common.toMd5
+import com.tonimurr.marvel.data.db.AppDatabase
 import com.tonimurr.marvel.data.remote.AppApi
 import com.tonimurr.marvel.data.repositories.MarvelRepositoryImplementation
 import com.tonimurr.marvel.domain.repositories.MarvelRepository
@@ -9,6 +12,7 @@ import com.tonimurr.marvel.domain.usecases.GetMarvelCharactersUseCase
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
+import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import okhttp3.Interceptor
 import okhttp3.OkHttpClient
@@ -63,8 +67,14 @@ class AppModule {
 
     @Singleton
     @Provides
-    fun providesMarvelRepository(api: AppApi): MarvelRepository {
-        return MarvelRepositoryImplementation(api)
+    fun providesAppDatabase(@ApplicationContext context: Context): AppDatabase {
+        return Room.databaseBuilder(context, AppDatabase::class.java, "MarvelDatabase").build()
+    }
+
+    @Singleton
+    @Provides
+    fun providesMarvelRepository(api: AppApi, db: AppDatabase): MarvelRepository {
+        return MarvelRepositoryImplementation(api, db)
     }
 
 

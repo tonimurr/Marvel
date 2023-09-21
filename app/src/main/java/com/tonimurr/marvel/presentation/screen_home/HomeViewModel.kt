@@ -30,28 +30,34 @@ class HomeViewModel @Inject constructor(
 
     fun fetchCharacters() {
         _getMarvelCharactersUseCase(_offset, _limit).onEach { resource ->
-            when(resource) {
+            when (resource) {
                 is Resource.Loading -> {
                     showHideInitialLoader(true)
                 }
+
                 is Resource.Success -> {
                     showHideInitialLoader(false)
                     resource.data?.let {
-                        _offset += _limit
+                        if (!it.fromCache) {
+                            _offset += it.total
+                        }
                         val existingMarvelCharacters = mutableListOf<Any>()
                         _liveMarvelCharacters.value?.let { oldList ->
-                            existingMarvelCharacters.addAll(oldList)
+                            if(it.offset != 0) { //Not adding first page because it is cached
+                                existingMarvelCharacters.addAll(oldList)
+                            }
                         }
-                        if(existingMarvelCharacters.isNotEmpty() && existingMarvelCharacters.last() is LoadingUIModel) {
+                        if (existingMarvelCharacters.isNotEmpty() && existingMarvelCharacters.last() is LoadingUIModel) {
                             existingMarvelCharacters.removeLast()
                         }
                         existingMarvelCharacters.addAll(it.data) //new data
-                        if(it.hasMore){
+                        if (it.hasMore) {
                             existingMarvelCharacters.add(LoadingUIModel())
                         }
                         _liveMarvelCharacters.postValue(existingMarvelCharacters)
                     }
                 }
+
                 is Resource.Error -> {
                     showHideInitialLoader(false)
                 }
@@ -60,9 +66,9 @@ class HomeViewModel @Inject constructor(
     }
 
     private fun showHideInitialLoader(show: Boolean) {
-        if(_offset == 0 && show) {
+        if (_offset == 0 && show) {
             _liveProgressBar.postValue(true)
-        }else{
+        } else {
             _liveProgressBar.postValue(false)
         }
     }
