@@ -1,8 +1,11 @@
 package com.tonimurr.marvel.data.repositories
 
+import com.tonimurr.marvel.data.base.ComicMapper
+import com.tonimurr.marvel.data.base.MarvelCharacterMapper
 import com.tonimurr.marvel.data.db.AppDatabase
 import com.tonimurr.marvel.data.model.MarvelCharacterDTO
 import com.tonimurr.marvel.data.remote.AppApi
+import com.tonimurr.marvel.domain.model.Comic
 import com.tonimurr.marvel.domain.model.ListDataResponse
 import com.tonimurr.marvel.domain.model.MarvelCharacter
 import com.tonimurr.marvel.domain.repositories.MarvelRepository
@@ -20,7 +23,7 @@ class MarvelRepositoryImplementation @Inject constructor(
         limit: Int?
     ): Flow<ListDataResponse<MarvelCharacter>> = flow {
         if (offset == 0) {
-            val dbMarvelCharacters = processMarvelCharactersData(_db.marvelCharacterDao().getAll())
+            val dbMarvelCharacters = MarvelCharacterMapper().mapListToDomain(_db.marvelCharacterDao().getAll())
             if(dbMarvelCharacters.isNotEmpty()) {
                 emit(
                     ListDataResponse(
@@ -38,7 +41,7 @@ class MarvelRepositoryImplementation @Inject constructor(
         if (offset == 0) {
             _db.marvelCharacterDao().insert(response.data.results)
         }
-        val marvelCharacters = processMarvelCharactersData(response.data.results)
+        val marvelCharacters = MarvelCharacterMapper().mapListToDomain(response.data.results)
         var hasMore = false
         if (response.data.offset != null && response.data.limit != null && response.data.total != null) {
             val totalLoaded = response.data.offset + response.data.limit
@@ -55,24 +58,21 @@ class MarvelRepositoryImplementation @Inject constructor(
         )
     }
 
-    private fun processMarvelCharactersData(data: List<MarvelCharacterDTO>): ArrayList<MarvelCharacter> {
-        val marvelCharacters = ArrayList<MarvelCharacter>()
-        for (mcDTO in data) {
-            var thumbnailURL = ""
-            mcDTO.thumbnail?.let {
-                thumbnailURL = "${it.path}.${it.extension}"
-            }
-            val mc = MarvelCharacter(
-                mcDTO.id,
-                mcDTO.name ?: "",
-                mcDTO.description ?: "",
-                thumbnailURL
+    override suspend fun getCharacterComics(
+        characterId: Long,
+        offset: Int?,
+        limit: Int?
+    ): Flow<ListDataResponse<Comic>> = flow {
+        val response = _api.getCharacterComics(characterId, offset, limit)
+        val comics = ComicMapper().mapListToDomain(response.data.results)
+        emit(
+            ListDataResponse(
+                comics,
+                comics.size,
+                offset ?: 0,
             )
-            if (mc.id != -1L) {
-                marvelCharacters.add(mc)
-            }
-        }
-        return marvelCharacters
+        )
     }
+
 
 }
