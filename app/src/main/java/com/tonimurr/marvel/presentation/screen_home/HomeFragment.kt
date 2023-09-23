@@ -41,7 +41,8 @@ class HomeFragment : MarvelFragment() {
             }
 
             override fun didClickOnCharacter(view: View, character: MarvelCharacter) {
-                Navigation.findNavController(view).navigate(R.id.action_homeFragment_to_characterDetailsFragment)
+                val action = HomeFragmentDirections.actionHomeFragmentToCharacterDetailsFragment(character)
+                Navigation.findNavController(view).navigate(action)
             }
         })
 
