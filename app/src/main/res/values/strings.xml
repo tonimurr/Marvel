@@ -15,4 +15,6 @@
     <string name="end_year_value">End Year: %d</string>
     <string name="ratings_value">Ratings: %s</string>
     <string name="ratings_not_available">Ratings not available</string>
+    <string name="marvel_characters">Marvel Characters</string>
+    <string name="character_details">Character Details</string>
 </resources>
