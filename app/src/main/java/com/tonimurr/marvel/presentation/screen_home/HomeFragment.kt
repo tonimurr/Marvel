@@ -7,6 +7,7 @@ import android.view.ViewGroup
 import androidx.fragment.app.viewModels
 import androidx.navigation.Navigation
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.google.android.material.appbar.MaterialToolbar
 import com.tonimurr.marvel.R
 import com.tonimurr.marvel.databinding.FragmentHomeBinding
 import com.tonimurr.marvel.domain.model.MarvelCharacter

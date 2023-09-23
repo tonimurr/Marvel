@@ -11,6 +11,7 @@ import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
+import com.google.android.material.appbar.MaterialToolbar
 import com.tonimurr.marvel.R
 import com.tonimurr.marvel.databinding.FragmentCharacterDetailsBinding
 import com.tonimurr.marvel.domain.model.Comic

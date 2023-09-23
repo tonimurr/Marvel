@@ -8,7 +8,7 @@
     <fragment
         android:id="@+id/homeFragment"
         android:name="com.tonimurr.marvel.presentation.screen_home.HomeFragment"
-        android:label="HomeFragment"
+        android:label="@string/marvel_characters"
         tools:layout="@layout/fragment_home">
         <action
             android:id="@+id/action_homeFragment_to_characterDetailsFragment"
@@ -22,7 +22,7 @@
     <fragment
         android:id="@+id/characterDetailsFragment"
         android:name="com.tonimurr.marvel.presentation.screen_character_details.CharacterDetailsFragment"
-        android:label="CharacterDetailsFragment"
+        android:label="@string/character_details"
         tools:layout="@layout/fragment_character_details">
         <argument
             android:name="marvelCharacter"
