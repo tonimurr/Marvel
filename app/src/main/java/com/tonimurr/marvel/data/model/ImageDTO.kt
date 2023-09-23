@@ -1,6 +1,6 @@
 package com.tonimurr.marvel.data.model
 
-data class ThumbnailDTO(
+data class ImageDTO(
     val path: String? = null,
     val extension: String? = null
 )

@@ -8,6 +8,10 @@ import com.tonimurr.marvel.data.db.AppDatabase
 import com.tonimurr.marvel.data.remote.AppApi
 import com.tonimurr.marvel.data.repositories.MarvelRepositoryImplementation
 import com.tonimurr.marvel.domain.repositories.MarvelRepository
+import com.tonimurr.marvel.domain.usecases.GetCharacterComicsUseCase
+import com.tonimurr.marvel.domain.usecases.GetCharacterEventsUseCase
+import com.tonimurr.marvel.domain.usecases.GetCharacterSeriesUseCase
+import com.tonimurr.marvel.domain.usecases.GetCharacterStoriesUseCase
 import com.tonimurr.marvel.domain.usecases.GetMarvelCharactersUseCase
 import dagger.Module
 import dagger.Provides
@@ -81,6 +85,26 @@ class AppModule {
     @Provides
     fun providesGetMarvelCharactersUseCase(marvelRepository: MarvelRepository): GetMarvelCharactersUseCase {
         return GetMarvelCharactersUseCase(marvelRepository)
+    }
+
+    @Provides
+    fun providesGetCharacterComicsUseCase(marvelRepository: MarvelRepository): GetCharacterComicsUseCase {
+        return GetCharacterComicsUseCase(marvelRepository)
+    }
+
+    @Provides
+    fun providesGetCharacterEventsUseCase(marvelRepository: MarvelRepository): GetCharacterEventsUseCase {
+        return GetCharacterEventsUseCase(marvelRepository)
+    }
+
+    @Provides
+    fun providesGetCharacterSeriesUseCase(marvelRepository: MarvelRepository): GetCharacterSeriesUseCase {
+        return GetCharacterSeriesUseCase(marvelRepository)
+    }
+
+    @Provides
+    fun providesGetCharacterStoriesUseCase(marvelRepository: MarvelRepository): GetCharacterStoriesUseCase {
+        return GetCharacterStoriesUseCase(marvelRepository)
     }
 
 }

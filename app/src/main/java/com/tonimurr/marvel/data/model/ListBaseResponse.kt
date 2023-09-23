@@ -1,6 +1,6 @@
 package com.tonimurr.marvel.data.model
 
-data class BaseResponse<T>(
+data class ListBaseResponse<T>(
     val code: Int?,
     val status: String?,
     val copyright: String?,

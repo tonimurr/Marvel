@@ -13,16 +13,24 @@ data class MarvelCharacterDTO(
     val description: String? = null,
     val modified: String? = null,
     @Embedded
-    val thumbnail: ThumbnailDTO? = null,
+    val thumbnail: ImageDTO? = null,
 ) {
+
+    companion object {
+
+    }
+
     @Ignore
-    val comics: DetailsHolderDTO<ComicsDTO>? = null
+    val comics: DetailsHolderDTO<ResourceDTO>? = null
     @Ignore
-    val series: DetailsHolderDTO<SeriesDTO>? = null
+    val series: DetailsHolderDTO<ResourceDTO>? = null
     @Ignore
-    val stories: DetailsHolderDTO<StoriesDTO>? = null
+    val stories: DetailsHolderDTO<ResourceDTO>? = null
     @Ignore
-    val events: DetailsHolderDTO<EventDTO>? = null
+    val events: DetailsHolderDTO<ResourceDTO>? = null
     @Ignore
     val urls: List<UrlDTO>? = null
+
+
+
 }
