@@ -18,7 +18,4 @@ class EventMapper : BaseMapper<Event, EventDTO> {
         )
     }
 
-    override fun mapToDTO(item: Event): EventDTO {
-        TODO("Not yet implemented, because we are not passing anything to the backend and to save time :)")
-    }
 }

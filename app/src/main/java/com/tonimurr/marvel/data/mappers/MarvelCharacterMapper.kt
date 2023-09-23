@@ -15,7 +15,4 @@ class MarvelCharacterMapper : BaseMapper<MarvelCharacter, MarvelCharacterDTO> {
         )
     }
 
-    override fun mapToDTO(item: MarvelCharacter): MarvelCharacterDTO {
-        TODO("Not yet implemented, because we are not passing anything to the backend and to save time :)")
-    }
 }

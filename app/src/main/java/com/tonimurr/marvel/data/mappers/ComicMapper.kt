@@ -14,7 +14,4 @@ class ComicMapper: BaseMapper<Comic, ComicsDTO> {
         )
     }
 
-    override fun mapToDTO(item: Comic): ComicsDTO {
-        TODO("Not yet implemented, because we are not passing anything to the backend and to save time :)")
-    }
 }

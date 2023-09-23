@@ -4,11 +4,15 @@ import com.tonimurr.marvel.data.mappers.ComicMapper
 import com.tonimurr.marvel.data.mappers.MarvelCharacterMapper
 import com.tonimurr.marvel.data.db.AppDatabase
 import com.tonimurr.marvel.data.mappers.EventMapper
+import com.tonimurr.marvel.data.mappers.SeriesMapper
+import com.tonimurr.marvel.data.mappers.StoryMapper
 import com.tonimurr.marvel.data.remote.AppApi
 import com.tonimurr.marvel.domain.model.Comic
 import com.tonimurr.marvel.domain.model.Event
 import com.tonimurr.marvel.domain.model.ListDataResponse
 import com.tonimurr.marvel.domain.model.MarvelCharacter
+import com.tonimurr.marvel.domain.model.Series
+import com.tonimurr.marvel.domain.model.Story
 import com.tonimurr.marvel.domain.repositories.MarvelRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
@@ -91,6 +95,42 @@ class MarvelRepositoryImplementation @Inject constructor(
                 ListDataResponse(
                     events,
                     events.size,
+                    offset ?: 0
+                )
+            )
+        }
+    }
+
+    override suspend fun getCharacterSeries(
+        characterId: Long,
+        offset: Int?,
+        limit: Int?
+    ): Flow<ListDataResponse<Series>> = flow {
+        val response = _api.getCharacterSeries(characterId, offset, limit)
+        if(response.code == 200) {
+            val series = SeriesMapper().mapListToDomain(response.data.results)
+            emit(
+                ListDataResponse(
+                    series,
+                    series.size,
+                    offset ?: 0
+                )
+            )
+        }
+    }
+
+    override suspend fun getCharacterStories(
+        characterId: Long,
+        offset: Int?,
+        limit: Int?
+    ): Flow<ListDataResponse<Story>> = flow {
+        val response = _api.getCharacterStories(characterId, offset, limit)
+        if(response.code == 200) {
+            val stories = StoryMapper().mapListToDomain(response.data.results)
+            emit(
+                ListDataResponse(
+                    stories,
+                    stories.size,
                     offset ?: 0
                 )
             )
