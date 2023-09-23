@@ -18,7 +18,7 @@ data class ComicsDTO(
     val textObjects: List<TextObjectDTO>?,
     val resourceURI: String?,
     val urls: List<UrlDTO>?,
-    val series: List<ResourceDTO>?,
+    val series: ResourceDTO?,
     val dates: List<DateDTO>?,
     val thumbnail: ImageDTO?,
     val images: List<ImageDTO>?

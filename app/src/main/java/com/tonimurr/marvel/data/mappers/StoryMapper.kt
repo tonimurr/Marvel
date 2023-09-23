@@ -1,6 +1,7 @@
 package com.tonimurr.marvel.data.mappers
 
 import com.tonimurr.marvel.data.base.BaseMapper
+import com.tonimurr.marvel.data.base.toStandardLargeURL
 import com.tonimurr.marvel.data.base.toUrl
 import com.tonimurr.marvel.data.model.StoryDTO
 import com.tonimurr.marvel.domain.model.Resource
@@ -16,7 +17,7 @@ class StoryMapper : BaseMapper<Story, StoryDTO> {
             item.id,
             item.title ?: "",
             item.description ?: "",
-            item.thumbnail?.toUrl() ?: "",
+            item.thumbnail?.toStandardLargeURL() ?: "",
             resource
         )
     }
