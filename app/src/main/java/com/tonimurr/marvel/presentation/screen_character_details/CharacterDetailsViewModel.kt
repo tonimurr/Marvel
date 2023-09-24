@@ -1,6 +1,5 @@
 package com.tonimurr.marvel.presentation.screen_character_details
 
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -32,18 +31,28 @@ class CharacterDetailsViewModel @Inject constructor(
         LOADING_EVENTS,
         LOADING_STORIES,
         LOADING_SERIES,
-        LOADING_COMICS
+        LOADING_COMICS,
+        REFRESH_DATA
     }
 
     private val _offset = 0
     private val _limit = 3
+    private val _refreshArray: ArrayList<DetailsLoadingType> = ArrayList()
+    private var _isRefreshing = false
 
     private val _liveMarvelCharacter: MutableLiveData<MarvelCharacter> = MutableLiveData(null)
     private val _liveCharacterComics: MutableLiveData<List<Comic>> = MutableLiveData(null)
     private val _liveCharacterEvents: MutableLiveData<List<Event>> = MutableLiveData(null)
     private val _liveCharacterSeries: MutableLiveData<List<Series>> = MutableLiveData(null)
     private val _liveCharacterStories: MutableLiveData<List<Story>> = MutableLiveData(null)
-    private val _liveLoading: MutableLiveData<Pair<DetailsLoadingType, Boolean>> = MutableLiveData(null)
+
+    private val _liveLoadingComics: MutableLiveData<Boolean> = MutableLiveData(false)
+    private val _liveLoadingEvents: MutableLiveData<Boolean> = MutableLiveData(false)
+    private val _liveLoadingStories: MutableLiveData<Boolean> = MutableLiveData(false)
+    private val _liveLoadingSeries: MutableLiveData<Boolean> = MutableLiveData(false)
+    private val _liveLoadingRefreshData: MutableLiveData<Boolean> = MutableLiveData(false)
+
+
 
     fun fetchCharacterDetails(character: MarvelCharacter) {
         val savedCharacter = _liveMarvelCharacter.value
@@ -56,6 +65,20 @@ class CharacterDetailsViewModel @Inject constructor(
         }
     }
 
+    fun refreshCharacter() {
+        if(!_isRefreshing) {
+            _isRefreshing = true
+            _refreshArray.clear()
+            _liveLoadingRefreshData.postValue(true)
+            _liveMarvelCharacter.value?.let {
+                fetchComics()
+                fetchEvents()
+                fetchSeries()
+                fetchStories()
+            }
+        }
+    }
+
     //#region liveData getters
 
     fun liveMarvelCharacter(): LiveData<MarvelCharacter> = _liveMarvelCharacter
@@ -63,7 +86,12 @@ class CharacterDetailsViewModel @Inject constructor(
     fun liveCharacterStories(): LiveData<List<Story>> = _liveCharacterStories
     fun liveCharacterEvents(): LiveData<List<Event>> = _liveCharacterEvents
     fun liveCharacterSeries(): LiveData<List<Series>> = _liveCharacterSeries
-    fun liveLoading(): LiveData<Pair<DetailsLoadingType, Boolean>> = _liveLoading
+    fun liveLoadingRefreshData(): LiveData<Boolean> = _liveLoadingRefreshData
+
+    fun liveLoadingComics(): LiveData<Boolean> = _liveLoadingComics
+    fun liveLoadingEvents(): LiveData<Boolean> = _liveLoadingEvents
+    fun liveLoadingStories(): LiveData<Boolean> = _liveLoadingStories
+    fun liveLoadingSeries(): LiveData<Boolean> = _liveLoadingSeries
 
     //endregion
 
@@ -73,16 +101,20 @@ class CharacterDetailsViewModel @Inject constructor(
             _getCharacterComicsUseCase(character.id, _offset, _limit).onEach { resource ->
                 when(resource) {
                     is Resource.Loading -> {
-                        _liveLoading.postValue(Pair(DetailsLoadingType.LOADING_COMICS, true))
+                        if(!_isRefreshing) {
+                            _liveLoadingComics.postValue(true)
+                        }
                     }
                     is Resource.Success -> {
-                        _liveLoading.postValue(Pair(DetailsLoadingType.LOADING_COMICS, false))
+                        _refreshArray.add(DetailsLoadingType.LOADING_COMICS)
+                        _liveLoadingComics.postValue(false)
                         resource.data?.let {
                             _liveCharacterComics.postValue(it.data)
                         }
+                        checkAllDataRefreshed()
                     }
                     is Resource.Error -> {
-                        _liveLoading.postValue(Pair(DetailsLoadingType.LOADING_COMICS, false))
+                        _liveLoadingComics.postValue(false)
                     }
                 }
             }.launchIn(viewModelScope)
@@ -94,16 +126,20 @@ class CharacterDetailsViewModel @Inject constructor(
             _getCharacterEventsUseCase(character.id, _offset, _limit).onEach { resource ->
                 when(resource) {
                     is Resource.Loading -> {
-                        _liveLoading.postValue(Pair(DetailsLoadingType.LOADING_EVENTS, true))
+                        if(!_isRefreshing) {
+                            _liveLoadingEvents.postValue(true)
+                        }
                     }
                     is Resource.Success -> {
-                        _liveLoading.postValue(Pair(DetailsLoadingType.LOADING_EVENTS, false))
+                        _refreshArray.add(DetailsLoadingType.LOADING_EVENTS)
+                        _liveLoadingEvents.postValue(false)
                         resource.data?.let {
                             _liveCharacterEvents.postValue(it.data)
                         }
+                        checkAllDataRefreshed()
                     }
                     is Resource.Error -> {
-                        _liveLoading.postValue(Pair(DetailsLoadingType.LOADING_EVENTS, false))
+                        _liveLoadingEvents.postValue(false)
                     }
                 }
             }.launchIn(viewModelScope)
@@ -115,16 +151,20 @@ class CharacterDetailsViewModel @Inject constructor(
             _getCharacterSeriesUseCase(character.id, _offset, _limit).onEach { resource ->
                 when(resource) {
                     is Resource.Loading -> {
-                        _liveLoading.postValue(Pair(DetailsLoadingType.LOADING_SERIES, true))
+                        if(!_isRefreshing) {
+                            _liveLoadingSeries.postValue(true)
+                        }
                     }
                     is Resource.Success -> {
-                        _liveLoading.postValue(Pair(DetailsLoadingType.LOADING_SERIES, false))
+                        _refreshArray.add(DetailsLoadingType.LOADING_SERIES)
+                        _liveLoadingSeries.postValue(false)
                         resource.data?.let {
                             _liveCharacterSeries.postValue(it.data)
                         }
+                        checkAllDataRefreshed()
                     }
                     is Resource.Error -> {
-                        _liveLoading.postValue(Pair(DetailsLoadingType.LOADING_SERIES, false))
+                        _liveLoadingSeries.postValue(false)
                     }
                 }
             }.launchIn(viewModelScope)
@@ -136,16 +176,20 @@ class CharacterDetailsViewModel @Inject constructor(
             _getCharacterStoriesUseCase(character.id, _offset, _limit).onEach { resource ->
                 when(resource) {
                     is Resource.Loading -> {
-                        _liveLoading.postValue(Pair(DetailsLoadingType.LOADING_STORIES, true))
+                        if(!_isRefreshing) {
+                            _liveLoadingStories.postValue(true)
+                        }
                     }
                     is Resource.Success -> {
-                        _liveLoading.postValue(Pair(DetailsLoadingType.LOADING_STORIES, false))
+                        _refreshArray.add(DetailsLoadingType.LOADING_STORIES)
+                        _liveLoadingStories.postValue(false)
                         resource.data?.let {
                             _liveCharacterStories.postValue(it.data)
                         }
+                        checkAllDataRefreshed()
                     }
                     is Resource.Error -> {
-                        _liveLoading.postValue(Pair(DetailsLoadingType.LOADING_STORIES, false))
+                        _liveLoadingSeries.postValue(false)
                     }
                 }
             }.launchIn(viewModelScope)
@@ -153,5 +197,16 @@ class CharacterDetailsViewModel @Inject constructor(
     }
 
     //endregion
+
+    private fun checkAllDataRefreshed() {
+        if(_refreshArray.contains(DetailsLoadingType.LOADING_STORIES) &&
+            _refreshArray.contains(DetailsLoadingType.LOADING_EVENTS) &&
+            _refreshArray.contains(DetailsLoadingType.LOADING_COMICS) &&
+            _refreshArray.contains(DetailsLoadingType.LOADING_SERIES) ){
+            _liveLoadingRefreshData.postValue(false)
+            _refreshArray.clear()
+            _isRefreshing = false
+        }
+    }
 
 }

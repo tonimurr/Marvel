@@ -20,6 +20,7 @@ class HomeViewModel @Inject constructor(
 
     private val _liveMarvelCharacters: MutableLiveData<List<Any>> = MutableLiveData(null)
     private val _liveProgressBar: MutableLiveData<Boolean> = MutableLiveData(false)
+    private val _liveRefreshData: MutableLiveData<Boolean> = MutableLiveData(false)
 
     private var _offset = 0
     private val _limit = 20
@@ -40,6 +41,13 @@ class HomeViewModel @Inject constructor(
                     resource.data?.let {
                         if (!it.fromCache) {
                             _offset += it.total
+                            //check on refresh if the data retrieved from the api
+                            _liveRefreshData.value?.let {refresh ->
+                                if(refresh) {
+                                    _liveRefreshData.postValue(false)
+                                    _liveMarvelCharacters.value = emptyList()
+                                }
+                            }
                         }
                         val existingMarvelCharacters = mutableListOf<Any>()
                         _liveMarvelCharacters.value?.let { oldList ->
@@ -79,6 +87,14 @@ class HomeViewModel @Inject constructor(
 
     fun liveProgressBar(): LiveData<Boolean> {
         return _liveProgressBar
+    }
+
+    fun liveRefreshData(): LiveData<Boolean> = _liveRefreshData
+
+    fun refresh() {
+        _offset = 0
+        _liveRefreshData.value = true
+        fetchCharacters()
     }
 
 }
