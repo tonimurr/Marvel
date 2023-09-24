@@ -16,10 +16,6 @@ data class MarvelCharacterDTO(
     val thumbnail: ImageDTO? = null,
 ) {
 
-    companion object {
-
-    }
-
     @Ignore
     val comics: DetailsHolderDTO<ResourceDTO>? = null
     @Ignore

@@ -97,20 +97,24 @@ class CharacterDetailsFragment : MarvelFragment() {
             )
         }
 
-        _viewModel.liveLoading().observe(viewLifecycleOwner) {
-            if(it != null) {
-                when(it.first) {
-                    CharacterDetailsViewModel.DetailsLoadingType.LOADING_COMICS -> {
-                        showHideProgressView(_binding.progressBarComics, it.second)
-                    }
-                    CharacterDetailsViewModel.DetailsLoadingType.LOADING_EVENTS -> {
-                        showHideProgressView(_binding.progressBarEvents, it.second)
-                    }
-                    else -> {
+        _viewModel.liveLoadingComics().observe(viewLifecycleOwner) {
+            showHideProgressView(_binding.progressBarComics, it)
+        }
 
-                    }
-                }
-            }
+        _viewModel.liveLoadingEvents().observe(viewLifecycleOwner) {
+            showHideProgressView(_binding.progressBarEvents, it)
+        }
+
+        _viewModel.liveLoadingSeries().observe(viewLifecycleOwner) {
+            showHideProgressView(_binding.progressBarSeries, it)
+        }
+
+        _viewModel.liveLoadingStories().observe(viewLifecycleOwner) {
+            showHideProgressView(_binding.progressBarStories, it)
+        }
+
+        _viewModel.liveLoadingRefreshData().observe(viewLifecycleOwner) {
+            _binding.swipeRefreshLayout.isRefreshing = it
         }
 
     }
@@ -152,6 +156,10 @@ class CharacterDetailsFragment : MarvelFragment() {
         _binding.recyclerViewSeries.layoutManager = LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false)
         _seriesAdapter = SeriesAdapter()
         _binding.recyclerViewSeries.adapter = _seriesAdapter
+
+        _binding.swipeRefreshLayout.setOnRefreshListener {
+            _viewModel.refreshCharacter()
+        }
     }
 
 }
