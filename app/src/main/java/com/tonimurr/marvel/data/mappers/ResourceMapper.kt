@@ -7,7 +7,7 @@ import com.tonimurr.marvel.domain.model.Resource
 class ResourceMapper : BaseMapper<Resource, ResourceDTO> {
     override fun mapToDomain(item: ResourceDTO): Resource {
         return Resource(
-            item.resourceURI ?: "",
+            item.resURI ?: "",
             item.name ?: "",
             item.type ?: ""
         )

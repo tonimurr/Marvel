@@ -65,14 +65,34 @@ class MarvelRepositoryImplementation @Inject constructor(
         }
     }
 
+    //I have just added caching on character comics, the same work is redundant for events, stories and series
     override suspend fun getCharacterComics(
         characterId: Long,
         offset: Int?,
         limit: Int?
     ): Flow<ListDataResponse<Comic>> = flow {
+        val mapper = ComicMapper()
+        val comicsDB = _db.comicsDao().getComicsByCharacterId(characterId)
+        if(comicsDB.isNotEmpty()) {
+            emit(
+                ListDataResponse(
+                    mapper.mapListToDomain(comicsDB),
+                    comicsDB.size,
+                    offset ?: 0
+                )
+            )
+        }
         val response = _api.getCharacterComics(characterId, offset, limit)
         if(response.code == 200) {
-            val comics = ComicMapper().mapListToDomain(response.data.results)
+            //Set the character ID for the comics
+            response.data.results.forEach {
+                it.characterId = characterId
+            }
+            //Cache data
+            if(response.data.results.isNotEmpty()) {
+                _db.comicsDao().insert(response.data.results)
+            }
+            val comics = mapper.mapListToDomain(response.data.results)
             emit(
                 ListDataResponse(
                     comics,
